@@ -1,6 +1,8 @@
 package com.example.a5thassignment;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
+
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -24,16 +26,17 @@ public class MainActivity extends AppCompatActivity {
     RequestQueue queue;
     JsonArrayRequest jsonArrayRequest;
     CustomAdapter customAdapter;
-    ArrayList<ListObject> arrayList;
+    ArrayList arrayList;
+    ListView lv;
 
-   private boolean isNetworkAvailable() {
+   public boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager
                 = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
-    private void fetchData() {
+    public void fetchData() {
         queue.add(jsonArrayRequest);
     }
 
@@ -42,21 +45,23 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Button button = findViewById(R.id.button);
-        final Toast toast = Toast.makeText(getApplicationContext(), "Internet connection not available", Toast.LENGTH_SHORT);
-        final ListView lv = findViewById(R.id.list_view);
+        FragmentManager fm = getSupportFragmentManager();
 
-        //Instantiate ListView
-        arrayList = new ArrayList<>();
+       /* //Fragments
+        ButtonFragment buttonFragment = (ButtonFragment) fm.findFragmentById(R.id.buttonFragment);
+        ListFragment listFragment = (ListFragment) fm.findFragmentById(R.id.listFragment);
+
+        //ListAdapter
+        arrayList = listFragment.arrayList;
+        ListView lv = listFragment.lv;*/
         customAdapter = new CustomAdapter(this, arrayList);
         lv.setAdapter(customAdapter);
 
-// Instantiate the RequestQueue.
+        //RequestQueue.
         queue = Volley.newRequestQueue(this);
         String url ="https://webd.savonia.fi/home/ktkoiju/j2me/test_json.php?dates&delay=1";
 
-
-        // Request a string response from the provided URL.
+        //Create request
         jsonArrayRequest = new JsonArrayRequest
                 (Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
 
@@ -87,18 +92,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-        button.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                //test that internet connection works
-                if (isNetworkAvailable() == false){
-                    toast.show();
-                }
-                else {
-// Fetch data and put it into ListView.
-                   fetchData();
-                }
-            }
-        });
+
     }
 }
 
